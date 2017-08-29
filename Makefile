@@ -1,8 +1,9 @@
 SHA := awk '/Successfully built/ { sha=$$3 } END { print sha }'
 
+# FIXME: MacOS wants base64 -D while GNU wants base64 -d
 websocketd: docker-build.log
-	$(SHA) $< | xargs -I {} docker run --rm -t {} /bin/sh -c 'sleep 30' &
-	docker ps -l -q | xargs -I {} docker cp {}:/go/bin/websocketd .
+	$(SHA) $< | xargs -I {} docker run --rm -t {} /bin/sh -c \
+		'base64 /go/bin/$@ ' | base64 -D >$@
 
 docker-build.log: Dockerfile
 	docker build . | tee $@
