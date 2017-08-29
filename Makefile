@@ -4,6 +4,7 @@ SHA := awk '/Successfully built/ { sha=$$3 } END { print sha }'
 websocketd: docker-build.log
 	$(SHA) $< | xargs -I {} docker run --rm -t {} /bin/sh -c \
 		'base64 /go/bin/$@ ' | base64 -D >$@
+	chmod 755 $@
 
 docker-build.log: Dockerfile
 	docker build . | tee $@
